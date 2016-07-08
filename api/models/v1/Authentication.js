@@ -1,25 +1,26 @@
 /**
- * User.js
+ * Authentication.js
  *
  * @description :: TODO: You might write a short summary of how this model works and what it represents here.
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
  */
-var uuid = require('uuid');
+
 module.exports = {
 
   attributes: {
-    guid : {
-      type: "string",
-      uuidv4: true,
+    id: {
+      type: "integer",
       primaryKey: true,
+      autoIncrement: true
+    },
+    username: {
+      type: "string",
       unique: true,
-      size: 30
+      size: 100
     },
-    name: {
-      type: "string"
-    },
-    auth: {
-      model: 'authentication'
+    password: {
+      type: 'string',
+      size: 100
     }
   }
 };

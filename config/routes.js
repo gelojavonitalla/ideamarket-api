@@ -34,9 +34,7 @@ module.exports.routes = {
 
   '/': {
     view: 'homepage'
-  },
-
-  'get /docs' : 'UserController.find'
+  }
 
   /***************************************************************************
   *                                                                          *

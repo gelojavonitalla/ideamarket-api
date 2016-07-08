@@ -1,25 +1,25 @@
 /**
- * User.js
+ * IdeaStat.js
  *
  * @description :: TODO: You might write a short summary of how this model works and what it represents here.
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
  */
-var uuid = require('uuid');
+
 module.exports = {
 
   attributes: {
-    guid : {
-      type: "string",
-      uuidv4: true,
+    id : {
+      type: "integer",
       primaryKey: true,
-      unique: true,
-      size: 30
+      autoIncrement: true
     },
-    name: {
-      type: "string"
+    views: {
+      type: "integer",
+      defaultsTo: 0
     },
-    auth: {
-      model: 'authentication'
+    likes: {
+      type: "integer",
+      defaultsTo: 0
     }
   }
 };
