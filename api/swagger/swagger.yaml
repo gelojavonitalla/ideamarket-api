@@ -1,28 +1,95 @@
 swagger: '2.0'
 info:
-  title: swagger-sails-template API
-  description: Should be replaced with actual Swagger Definition
-  version: "0.0.1"
+  title: IdeaMarket API
+  description: IdeaMarket API Definition
+  version: "0.1.0"
 # the domain of the service
-host: localhost:1337
+host: api.ideamarket.xyz
 # array of all schemes that your API supports
 schemes:
   - http
-  - https
 # will be prefixed to all paths
 basePath: /api/v1
 produces:
   - application/json
 paths:
+  /ideas:
+    get:
+      summary: Idea Information
+      description: |
+        The endpoint returns information about a idea.
+      parameters:
+        - name: search
+          in: query
+          description: The search string for the idea. This will be match againts the idea title, content, and tags
+          required: false
+          type: string
+      tags:
+        - Ideas
+      responses:
+        200:
+          description: An array of ideas
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Idea'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    post:
+      parameters:
+        - name: idea
+          in: body
+          description: The idea JSON you want to post
+          schema:
+            $ref: '#/definitions/Idea'
+          required: true
+      tags:
+        - Ideas
+      responses:
+        200:
+          description: Make a new idea
+  /ideas/{guid}:
+    get:
+      parameters:
+        - name: guid
+          in: path
+          type: string
+          description: ID of the idea
+          required: true
+      tags:
+        - Ideas
+      responses:
+        200:
+          description: Sends the Idea with GUID
+    put:
+      parameters:
+        - name: guid
+          in: path
+          type: string
+          description: ID of the idea
+          required: true
+        - name: body
+          in: body
+          description: the description
+          required: false
+          schema:
+            $ref: '#/definitions/Idea'
+      tags:
+        - Ideas
+      responses:
+        200:
+          description: Sends the User with GUID        
   /users:
     get:
       summary: User Information
       description: |
         The endpoint returns information about a user.
       parameters:
-        - name: userId
+        - name: username
           in: query
-          description: The email address of the user.
+          description: The username the user.
           required: false
           type: string
       tags:
@@ -42,7 +109,7 @@ paths:
       parameters:
         - name: user
           in: body
-          description: The pet JSON you want to post
+          description: The user JSON you want to post
           schema:
             $ref: '#/definitions/User'
           required: true
@@ -50,7 +117,7 @@ paths:
         - Users
       responses:
         200:
-          description: Make a new pet
+          description: Make a new user
   /users/{guid}:
     get:
       parameters:
@@ -83,15 +150,88 @@ paths:
         200:
           description: Sends the User with GUID
 definitions:
+ Idea:
+  type: object
+  properties:
+    guid:
+      type: string
+      description: Unique identifier for the Idea
+    ideaStat:
+      $ref: '#/definitions/IdeaStat'
+    ideator:
+      $ref: '#/definitions/User'
+    dateCreated:
+      type: string
+      format: date
+      description: the idea created date
+    access:
+      type: string
+      enum: ['public', 'private', 'protected']
+      description: the access type for the idea
+                  Public - accessible to everyone, even users not logged-in to the application. No credits required to view.
+                  Private - Only logged-in users will be able to access it. Credits is required to view.
+                  Protected - Viewers need to ask permission from the idea creator (ideator). Credit is required to view (higher than public). Protected ideas are for ideators to get investors and developers work on their idea. Can also be used when posting jobs.
+    title:
+      type: string
+      description: short description for the idea.
+    businessModel:
+      type: string
+      description: the idea's business model
+    detail:
+      type: string
+      description: idea full details
+    tags:
+     type: array
+     items: 
+      type: string
+     description: can be used to filter ideas
+    similarApplications:
+      type: array
+      items:
+        $ref: '#/definitions/Link'
+ IdeaStat:
+    type: object
+    description: useful statistics to aid users when selecting ideas to view
+    properties:
+      views:
+        type: integer
+        format: int32
+        description: the total number of views since the idea was created
+      likes:
+        type: integer
+        format: int32
+        description: the total number of likes since the idea was created
+ Link:
+    type: object
+    properties:
+      url:
+        type: string
+        description: short description for the idea
  User:
-     type: object
-     properties:
-       guid:
-        type: string
-        description: Unique identifier for the Account
-       userId:
-        type: string
-        description: Unique identifier for the Account
+  type: object
+  properties:
+    guid:
+      type: string
+      description: Unique identifier for the User
+    name:
+      type: string
+      description: the name of the user that will be displayed in the application
+    auth:
+      $ref: '#/definitions/Authentication'
+ Authentication:
+  type: object
+  description: information to be used for user authentication
+  properties:
+    guid:
+      type: string
+      description: Unique identifier.
+    username:
+      type: string
+      description: Unique identifier.
+    password:
+      type: string
+      format: password
+      description: Unique identifier.
  Error:
     type: object
     properties:
