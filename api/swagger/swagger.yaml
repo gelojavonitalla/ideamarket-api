@@ -150,82 +150,6 @@ paths:
         200:
           description: Sends the User with GUID
 definitions:
- Idea:
-  type: object
-  properties:
-    guid:
-      type: string
-      description: Unique identifier for the Idea
-    ideaStat:
-      $ref: '#/definitions/IdeaStat'
-    ideator:
-      $ref: '#/definitions/User'
-    dateCreated:
-      type: string
-      format: dateTime
-      description: the idea created date
-    access:
-      type: string
-      enum: ['public', 'private', 'protected']
-      description: the access type for the idea
-                  Public - accessible to everyone, even users not logged-in to the application. No credits required to view.
-                  Private - Only logged-in users will be able to access it. Credits is required to view.
-                  Protected - Viewers need to ask permission from the idea creator (ideator). Credit is required to view (higher than public). Protected ideas are for ideators to get investors and developers work on their idea. Can also be used when posting jobs.
-    title:
-      type: string
-      description: short description for the idea.
-    businessModel:
-      type: string
-      description: the idea's business model
-    detail:
-      type: string
-      description: idea full details
-    tags:
-     type: array
-     items: 
-      type: string
-     description: can be used to filter ideas
-    similarApplications:
-      type: array
-      items:
-        $ref: '#/definitions/Link'
- IdeaStat:
-    type: object
-    description: useful statistics to aid users when selecting ideas to view
-    properties:
-      id:
-        type: integer
-        format: int64
-        description: primary key
-      views:
-        type: integer
-        format: int32
-        description: the total number of views since the idea was created
-      likes:
-        type: integer
-        format: int32
-        description: the total number of likes since the idea was created
- Link:
-    type: object
-    properties:
-      id:
-        type: integer
-        format: int64
-        description: primary key
-      url:
-        type: string
-        description: short description for the idea
- User:
-  type: object
-  properties:
-    guid:
-      type: string
-      description: Unique identifier for the User
-    name:
-      type: string
-      description: the name of the user that will be displayed in the application
-    auth:
-      $ref: '#/definitions/Authentication'
  Authentication:
   type: object
   description: information to be used for user authentication
@@ -240,12 +164,229 @@ definitions:
       type: string
       format: password
  Error:
-    type: object
-    properties:
-      code:
-        type: integer
-        format: int32
-      message:
-        type: string
-      fields:
-        type: string
+  type: object
+  properties:
+    code:
+      type: integer
+      format: int32
+    message:
+      type: string
+    fields:
+      type: string
+ Idea:
+  type: object
+  description: Idea posted can also be used to post Jobs
+  properties:
+    guid:
+      type: string
+      description: Unique identifier for the Idea
+    stat:
+      $ref: '#/definitions/IdeaStat'
+    ideator:
+      $ref: '#/definitions/User'
+    dateCreated:
+      type: string
+      format: dateTime
+      description: the idea created date
+    access:
+      type: string
+      enum: ['public', 'private', 'protected']
+      description: the access type for the idea |
+                  Public - Accessible to everyone, even Users not logged-in to the application. No credits required to view the idea.
+                  Private - Only logged-in Users will be able to access it. Credits is required to view the idea. Credit is fixed for all private idea and set by IdeaMarket.
+                  Protected - Protected Ideas are for Ideators (Idea Creator) to get investors and developers work on their Idea. Viewers need to ask permission from the Ideator in order to view the Idea. Credit is  determined by the Ideator and can be set to 0. The credit can be used by the Ideator to determine how serious an investor or developer on investing to the Idea.
+    title:
+      type: string
+      description: A short description for the Idea. The text to show on a list
+    businessModel:
+      type: string
+      description: The business model for the Idea. Protected Ideas is advised to have this for viewers to like it after spending credits.
+    detail:
+      type: string
+      description: idea full details
+    tags:
+     type: array
+     description: can be used to filter ideas
+     items: 
+      type: string
+    status:
+      type: string
+      enum: ['draft', 'published']
+      description: can be used to filter ideas
+    similarApplications:
+      type: array
+      items:
+        $ref: '#/definitions/Link'
+    jobs:
+      type: array
+      items: 
+        $ref: '#/definitions/Job'
+    comments:
+      type: array
+      items: 
+        $ref: '#/definitions/IdeaComment'
+ IdeaStat:
+  type: object
+  description: useful statistics to aid users when selecting ideas to view. Users are expected to view ideas with high views and likes.
+  properties:
+    id:
+      type: integer
+      format: int64
+      description: primary key. value is autogenerated
+    idea:
+      type: string
+      description: Idea GUID
+    userViews:
+      type: array
+      items:
+        $ref: '#/definitions/View'
+    views:
+      type: integer
+      format: int32
+      description: Every request in an Idea is counted as view even failed one. However, large number of views doesn't guarantee a strong idea since this can be exploited. The count is the total of User views (private and protected) and public views. if not for the public views we woudn't be needing this and will just use userViews size.
+    likes:
+      type: array
+      items:
+        $ref: '#/definitions/Like'
+    points:
+      type: integer
+      format: int32
+      description: useful when calculating for a User's reputation. Points will come from views, likes, and comments
+ IdeaComment:
+  type: object
+  description: Introduced to cultivate interaction among members, to provide feedback on an Idea and make it more stronger. Allow only 2 levels of comment.
+  properties:
+    id:
+      type: integer
+      format: int64
+      description: primary key. value is autogenerated
+    author:
+      type: string
+      description: User GUID
+    idea:
+      type: string
+      description: Idea GUID
+    parent:
+      type: integer
+      format: int64
+      description: If present the comment is already a second level comment. Additional comment will be added on the same thread.
+    detail:
+      type: string
+      description: the comment content
+    dateCreated:
+      type: string
+      format: dateTime
+      description: the idea created date
+ Job:
+  type: object
+  description: Job posting for an Idea. They can be searched separately.
+  properties:
+    id:
+      type: integer
+      format: int64
+      description: primary key. value is autogenerated
+    title:
+      type: string
+    detail:
+      type: string
+    stat:
+      $ref: '#/definitions/JobStat'
+    contract:
+      type: string
+      enum: ['part-time', 'full-time']
+    location:
+      type: string
+      description: could be an address or ideator may post it as remote job
+    hire:
+      type: integer
+      format: int32
+      description: the number of people to hire for this job posting. defaults to 1
+ JobStat:
+  type: object
+  description: useful information for Job seekers
+  properties:
+    id:
+      type: integer
+      format: int64
+      description: primary key. value is autogenerated
+    applicants:
+      type: array
+      items:
+         $ref: '#/definitions/User'
+    interviewing:
+      type: array
+      items:
+         $ref: '#/definitions/User'
+ Like:
+  type: object
+  description: useful to identify strong ideas. 
+  properties:
+    id:
+      type: integer
+      format: int64
+      description: primary key. value is autogenerated.
+    user:
+      type: string
+      description: the GUID of the user who liked this idea. 
+    stat:
+      type: integer
+      format: int64
+      description: ideastat id
+ Link:
+  type: object
+  properties:
+    id:
+      type: integer
+      format: int64
+      description: primary key. not required. value is autogenerated
+    url:
+      type: string
+      description: short description for the idea
+ User:
+  type: object
+  properties:
+    guid:
+      type: string
+      description: Unique identifier for the User
+    name:
+      type: string
+      description: the name of the user that will be displayed in the application
+    dateCreated:
+      type: string
+      format: dateTime
+      description: account creation date. helpful when 
+    auth:
+      $ref: '#/definitions/Authentication'
+    stat:
+      $ref: '#/definitions/UserStat'
+ UserStat:
+  type: object
+  description: Useful information before viewing a new idea. if the views and likes are small, viewers can check the ideators stat before deciding to past or continue viewing the idea.
+  properties:
+    id:
+      type: integer
+      format: int64
+      description: primary key. value is autogenerated
+    reputation:
+      type: integer
+      format: int32
+      description: Reputation points will come from ideas posted and comments given. Idea points will come from likes and views.
+    ideas:
+      type: integer
+      format: int32
+      description: the total number of the ideas the Ideator has published
+ View:
+   type: object
+   description: logged-in user views
+   properties:
+    id:
+      type: integer
+      format: int64
+      description: primary key. value is autogenerated.
+    user:
+      type: string
+      description: the guid of the user who viewed the idea. 
+    stat:
+      type: integer
+      format: int64
+      description: ideastat id
