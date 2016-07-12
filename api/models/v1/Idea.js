@@ -30,7 +30,7 @@ module.exports = {
       enum: ['public', 'private', 'protected']
     },
     title: {
-      type: string,
+      type: "string",
       size: 100
     },
     businessModel: {
