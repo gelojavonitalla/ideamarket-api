@@ -1,7 +1,7 @@
 /**
  * Idea.js
  *
- * @description :: TODO: You might write a short summary of how this model works and what it represents here.
+ * @description :: Idea posted on IdeaMarket
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
  */
 
@@ -9,6 +9,19 @@ var uuid = require('uuid');
 module.exports = {
 
   attributes: {
+    access: {
+      type: 'string',
+      enum: ['public', 'protected', 'private']
+    },
+    businessModel: {
+      type: "mediumtext"
+    },
+    comments: {
+      collection: 'comment'
+    },
+    detail: {
+      type: "mediumtext"
+    },
     guid: {
       type: "string",
       uuidv4: true,
@@ -16,36 +29,27 @@ module.exports = {
       unique: true,
       size: 30
     },
-    ideaStat: {
-      model: 'ideastat'
-    },
     ideator: {
       model: 'user'
     },
-    dateCreated: {
-      type: 'datetime'
+    similarApplications: {
+      type: "array",
+      item: "string"
     },
-    access: {
-      type: 'string',
-      enum: ['public', 'private', 'protected']
-    },
-    title: {
+    status: {
       type: "string",
-      size: 100
+      enum: ['draft', 'published']
     },
-    businessModel: {
-      type: "mediumtext"
-    },
-    detail: {
-      type: "mediumtext"
+    stat: {
+      model: 'ideastat'
     },
     tags: {
       type: "array",
       item: "string"
     },
-    similarApplications: {
-      type: "array",
-      item: "string"
+    title: {
+      type: "string",
+      size: 100
     }
   },
 

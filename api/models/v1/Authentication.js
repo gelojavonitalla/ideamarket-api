@@ -1,11 +1,12 @@
 /**
  * Authentication.js
  *
- * @description :: TODO: You might write a short summary of how this model works and what it represents here.
+ * @description :: Information to be used for user authentication
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
  */
 
 module.exports = {
+  autoCreatedAt : false,
 
   attributes: {
     id: {

@@ -6,7 +6,8 @@
  */
 var uuid = require('uuid');
 module.exports = {
-
+  autoCreatedAt : false,
+  
   attributes: {
     guid : {
       type: "string",
@@ -20,6 +21,9 @@ module.exports = {
     },
     auth: {
       model: 'authentication'
+    },
+    stat: {
+      model: 'userstat'
     }
   }
 };
