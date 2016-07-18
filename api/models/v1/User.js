@@ -6,10 +6,13 @@
  */
 var uuid = require('uuid');
 module.exports = {
-  autoCreatedAt : false,
-  
+  autoCreatedAt: false,
+
   attributes: {
-    guid : {
+    auth: {
+      model: 'auth'
+    },
+    id: {
       type: "string",
       uuidv4: true,
       primaryKey: true,
@@ -17,14 +20,28 @@ module.exports = {
       size: 30
     },
     name: {
-      type: "string"
+      type: "string",
+      required: true,
+      size: 50
     },
-    auth: {
-      model: 'authentication'
+    bio: {
+      type: "string",
+      size: 150
+    },
+    website: {
+      type: "string",
+      size: 150
     },
     stat: {
       model: 'userstat'
     }
+  },
+
+  beforeCreate: function (user, callback) {
+    if (!user.id) {
+      user.id = uuid.v4();
+    }
+    callback();
   }
 };
 

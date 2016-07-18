@@ -11,7 +11,8 @@ module.exports = {
   attributes: {
     access: {
       type: 'string',
-      enum: ['public', 'protected', 'private']
+      enum: ['public', 'protected', 'private'],
+      defaultsTo: 'public'
     },
     businessModel: {
       type: "mediumtext"
@@ -20,42 +21,45 @@ module.exports = {
       collection: 'comment'
     },
     detail: {
-      type: "mediumtext"
+      type: "mediumtext",
+      required: true
     },
-    guid: {
-      type: "string",
+    id: {
+      type: 'string',
       uuidv4: true,
       primaryKey: true,
       unique: true,
+      required: true,
       size: 30
     },
     ideator: {
-      model: 'user'
+      model: 'user',
+      required: true
     },
     similarApplications: {
-      type: "array",
-      item: "string"
+      type: "array"
     },
     status: {
-      type: "string",
-      enum: ['draft', 'published']
+      type: 'string',
+      enum: ['draft', 'published'],
+      defaultsTo: 'draft'
     },
     stat: {
       model: 'ideastat'
     },
     tags: {
-      type: "array",
-      item: "string"
+      type: "array"
     },
     title: {
       type: "string",
-      size: 100
+      size: 100,
+      required: true
     }
   },
 
   beforeCreate: function (idea, callback) {
-    if (!idea.guid) {
-      idea.guid = uuid.v4();
+    if (!idea.id) {
+      idea.id = uuid.v4();
     }
     callback();
   }

@@ -6,22 +6,31 @@
  */
 
 module.exports = {
-  autoCreatedAt : false,
+  autoCreatedAt: false,
 
   attributes: {
     id: {
-      type: "integer",
+      type: 'integer',
       primaryKey: true,
       autoIncrement: true
     },
     username: {
-      type: "string",
+      type: 'string',
       unique: true,
       size: 100
+    },
+    user: {
+      model: 'user'
     },
     password: {
       type: 'string',
       size: 100
+    },
+
+    toJSON: function () {
+      var obj = this.toObject();
+      delete obj.password;
+      return obj;
     }
   }
 };
