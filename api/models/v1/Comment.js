@@ -10,27 +10,27 @@ module.exports = {
 
   attributes: {
     author: {
-      model: "user"
+      model: 'user'
     },
     detail: {
-      type: "mediumtext"
+      type: 'mediumtext'
     },
     id : {
-      type: "integer",
+      type: 'integer',
       primaryKey: true,
       autoIncrement: true
     },
     idea: {
-      model: "idea"
+      model: 'idea'
     },
     officialName: {
-      type: "string"
+      type: 'string'
     },
     parent : {
-      model: "comment"
+      model: 'comment'
     },
     url: {
-      type: "string"
+      type: 'string'
     }
   }
 };

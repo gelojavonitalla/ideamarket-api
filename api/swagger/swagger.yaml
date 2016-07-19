@@ -13,23 +13,40 @@ basePath: /api/v1
 produces:
   - application/json
 paths:
-  /auth:
+  /auth/sign-up:
     post:
-      description: Used to create new authentication credentials. 
+      description: User sign-up API
       parameters:
-        - name: authentication
-          in: body
-          description: The authentication JSON to be used for authentication
-          schema:
-            $ref: '#/definitions/Authentication'
+        - name: username
+          in: formData
+          description: For local authentication this is the email of the user.
+          type: string
+          required: true
+        - name: password
+          in: formData
+          description: The password to use when logging-in
+          type: string
+          format: password
+          required: true
+        - name: name
+          in: formData
+          description: The fullname of the user
+          type: string
           required: true
       tags:
         - Authentication
       responses:
         200:
           description: Creates new authentication credentials
+          schema:
+            $ref: '#/definitions/User'
+        400:
+          description: Invalid attributes
+          schema:
+            $ref: '#/definitions/Error'
   /auth/login:
     post:
+      description: THe API for login
       parameters:
         - name: idea
           in: body
@@ -42,8 +59,9 @@ paths:
       responses:
         200:
           description: User was successfully logged-in into the system
-  /auth/changepassword:
+  /auth/change-password:
     put:
+      description: The API when changing password
       parameters:
         - name: idea
           in: body
@@ -58,7 +76,7 @@ paths:
           description: User password was successfully updated.
   /ideas:
     get:
-      summary: Idea Information
+      summary: Retrieves all ideas given the search parameters
       description: |
         The endpoint returns information about a idea.
       parameters:
@@ -81,6 +99,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
     post:
+      summary: Creates a new Idea
       parameters:
         - name: idea
           in: body
@@ -93,10 +112,11 @@ paths:
       responses:
         200:
           description: Make a new idea
-  /ideas/{guid}:
+  /ideas/{id}:
     get:
+      summary: Retrieves an idea using its ID
       parameters:
-        - name: guid
+        - name: id
           in: path
           type: string
           description: ID of the idea
@@ -107,15 +127,16 @@ paths:
         200:
           description: Sends the Idea with GUID
     put:
+      summary: Updates an Idea
       parameters:
-        - name: guid
+        - name: id
           in: path
           type: string
           description: ID of the idea
           required: true
         - name: body
           in: body
-          description: the description
+          description: No need to add Child object that is not updated.
           required: false
           schema:
             $ref: '#/definitions/Idea'
@@ -124,11 +145,11 @@ paths:
       responses:
         200:
           description: Sends the User with GUID        
-  /ideas/{guid}/comments:
+  /ideas/{id}/comments:
     post:
-      description: adds a comment to an idea
+      summary: adds a comment to an idea
       parameters:
-        - name: guid
+        - name: id
           in: path
           type: string
           description: ID of the idea to which the comment will be added
@@ -139,21 +160,42 @@ paths:
           schema:
             $ref: '#/definitions/Comment'
           required: true
+      tags:
+        - Ideas
       responses:
         200:
-          description: A new comment was added to the idea
-  /ideas/{guid}/stat:
+          description: The idea with the new comment
+          schema:
+            $ref: '#/definitions/Idea'
     get:
-      description: request for the statistics
+      summary: Retrieves all comments from an Idea
       parameters:
-        - name: guid
+        - name: id
           in: path
           type: string
           description: ID of the idea to which the comment will be added
           required: true
+      tags:
+        - Ideas
       responses:
         200:
-          description: An array of ideas
+          description: A new comment was added to the idea
+          schema:
+            $ref: '#/definitions/Comment'
+  /ideas/{id}/stats:
+    get:
+      description: request for the statistics
+      parameters:
+        - name: id
+          in: path
+          type: string
+          description: ID of the idea to which the comment will be added
+          required: true
+      tags:
+        - Ideas
+      responses:
+        200:
+          description: The stat for this idea
           schema:
            $ref: '#/definitions/IdeaStat'
         default:
@@ -166,9 +208,9 @@ paths:
       description: |
         The endpoint returns information about a user.
       parameters:
-        - name: username
+        - name: populate
           in: query
-          description: The username the user.
+          description: Comma separated list of child objects to populate i.e. stat, auth.
           required: false
           type: string
       tags:
@@ -197,14 +239,19 @@ paths:
       responses:
         200:
           description: Make a new user
-  /users/{guid}:
+  /users/{id}:
     get:
       parameters:
-        - name: guid
+        - name: id
           in: path
           type: string
           description: ID of the user
           required: true
+        - name: populate
+          in: query
+          description: Comma separated list of child objects to populate i.e. stat, auth.
+          required: false
+          type: string
       tags:
         - Users
       responses:
@@ -212,7 +259,7 @@ paths:
           description: Sends the User with GUID
     put:
       parameters:
-        - name: guid
+        - name: id
           in: path
           type: string
           description: ID of the user
@@ -228,10 +275,26 @@ paths:
       responses:
         200:
           description: Sends the User with GUID
-  /users/{guid}/stat:
+  /users/{id}/stat:
+    get:
+      description: the user statistics
+      parameters:
+        - name: id
+          in: path
+          type: string
+          description: ID of the user
+          required: true
+      tags:
+        - Users
+      responses:
+        200:
+          description: Sends the User stat
+          schema:
+            $ref: '#/definitions/UserStat'
+  /users/{id}/auth:
     get:
       parameters:
-        - name: guid
+        - name: id
           in: path
           type: string
           description: ID of the user
@@ -251,9 +314,10 @@ definitions:
     id:
       type: integer
       format: int64
-      description: primary key. auto-generated if not supplied
+      description: Primary key. Auto-generated if not supplied
     username:
       type: string
+      format: For local Authentication this is the User's email address
     password:
       type: string
       format: password
@@ -269,9 +333,14 @@ definitions:
     name:
       type: string
       description: the popular name for the brand i.e. Uber
-    official_name:
+    officialName:
       type: string
       description: the formal name or could be the company name i.e. Uber Technologies Inc.
+    tags:
+     type: array
+     description: can be used to filter and search ideas
+     items: 
+      type: string
     url:
       type: string
       description: url for the brand
@@ -283,30 +352,38 @@ definitions:
     id:
       type: integer
       format: int64
-      description: primary key. value is auto-generated
+      description: Primary key. Value is auto-generated
     author:
-       $ref: '#/definitions/User'
+      type: string
+      description: User ID.
     parent:
-       $ref: '#/definitions/Comment'
+      type: string
+      description: Parent comment ID. Only present if comment is a reply to another comment.
     detail:
       type: string
-      description: the comment content
-    lastUpdateAt:
+      description: The comment content
+    updatedAt:
       type: string
       format: dateTime
-      description: auto-generated by the system.
-  required: ['id', 'author']
+      description: Auto-generated by the system.
+  required: ['author', 'detail']
  Error:
   type: object
   properties:
     code:
       type: integer
       format: int32
+    status:
+      type: integer
+      format: int32
+    reason:
+      type: string
+    details:
+      type: string
     message:
       type: string
-    fields:
+    invalidAttributes:
       type: string
-  required: ['code', 'message']
  Idea:
   type: object
   description: Idea posted on IdeaMarket
@@ -321,22 +398,23 @@ definitions:
                   Protected - Only logged-in users will be able to access it. Credit is required to view and set by the Ideator.  Can also be used when posting jobs. Search engine cannot crawl on the content of the idea.
                   
                   Private - Only logged-in users will be able to access it. Ideator will need to send invitation to other users to gain access to the idea. Ideators are charged for every private idea they create. This is for an Idea internally develop
-    businessModel:
-      type: string
-      description: The business model for the Idea. Protected Ideas is advised to have this for viewers to like it after spending credits.
     comments:
       type: array
       items: 
         $ref: '#/definitions/Comment'
+    createdAt:
+      type: string
+      format: dateTime
+      description: Auto-generated by the system. Together with updatedAt it will be used to determine if comment was updated since it was created.
     detail:
       type: string
-      description: idea full details
-    guid:
+      description: Idea full details
+    id:
       type: string
       description: Auto-generated if not supplied. Unique identifier for the Idea.
     ideator:
       type: string
-      description: User GUID.
+      description: User ID.
     status:
       type: string
       enum: ['draft', 'published']
@@ -349,15 +427,19 @@ definitions:
     stat:
       type: integer
       format: int64
-      description: IdeaStat GUID. During creation of Idea if not present, the object will be auto-generated.
+      description: IdeaStat ID. During creation of Idea if not present, the object will be auto-generated.
     tags:
      type: array
-     description: can be used to filter and search ideas
+     description: Can be used to filter and search ideas. Tags will also be used to tag existing ideas.
      items: 
       type: string
     title:
       type: string
-      description: A short description for the Idea. The text to show on a list
+      description: A short description for the Idea. The text to show on a list.
+    updatedAt:
+      type: string
+      format: dateTime
+      description: Auto-generated by the system. Together with createdAt it will be used to determine if comment was updated since it was created.
   required: ['detail', 'ideator', 'title']
  IdeaStat:
   type: object
@@ -406,16 +488,15 @@ definitions:
       type: integer
       format: int64
       description: UserStat ID
-  required: ['name', 'auth']
+  required: ['name']
  UserStat:
   type: object
-  description: Useful information before viewing a new idea. If the views and likes are small, viewers can check the ideators statistics before deciding to past or continue viewing the idea.
-    stat is updated every time an update on idea is performed.
+  description: Useful information before viewing a new idea. If the views and likes are small, viewers can check the ideators statistics before deciding to past or continue viewing the idea. Stat is updated every time an update on idea is performed.
   properties:
     id:
       type: integer
       format: int64
-      description: primary key. value is autogenerated
+      description: Primary key. Value is autogenerated
     reputation:
       type: integer
       format: int32

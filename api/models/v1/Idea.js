@@ -14,9 +14,6 @@ module.exports = {
       enum: ['public', 'protected', 'private'],
       defaultsTo: 'public'
     },
-    businessModel: {
-      type: "mediumtext"
-    },
     comments: {
       collection: 'comment'
     },
@@ -29,7 +26,6 @@ module.exports = {
       uuidv4: true,
       primaryKey: true,
       unique: true,
-      required: true,
       size: 30
     },
     ideator: {
@@ -61,7 +57,15 @@ module.exports = {
     if (!idea.id) {
       idea.id = uuid.v4();
     }
-    callback();
+
+    if (!idea.stat) {
+      IdeaStat.create({}).then(function(stat){
+        idea.stat = stat.id;
+        callback();
+      }).catch(callback);
+    } else {
+      callback();
+    }
   }
 };
 

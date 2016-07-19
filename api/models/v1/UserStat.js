@@ -16,13 +16,16 @@ module.exports = {
       primaryKey: true,
       autoIncrement: true
     },
+    ideas: {
+      type: "integer",
+      defaultsTo: 0
+    },
     reputation: {
       type: "integer",
       defaultsTo: 0
     },
-    ideas: {
-      type: "integer",
-      defaultsTo: 0
+    user: {
+      model: "user"
     }
   }
 };

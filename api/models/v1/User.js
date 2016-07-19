@@ -41,7 +41,15 @@ module.exports = {
     if (!user.id) {
       user.id = uuid.v4();
     }
-    callback();
+
+    if (!user.stat) {
+      UserStat.create({}).then(function(stat){
+        user.stat = stat.id;
+        callback();
+      }).catch(callback);
+    } else {
+      callback();
+    }
   }
 };
 

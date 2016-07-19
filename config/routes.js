@@ -46,11 +46,7 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
-  'post /api/v1/auth' : 'v1/AuthController.create',
+  'post /api/v1/auth/sign-up' : 'v1/AuthController.signUp',
   'post /api/v1/auth/login' : 'v1/AuthController.login',
-  'put /api/v1/auth/changepassword' : 'v1/AuthController.changePassword',
-
-  'get /api/v1/users/{id}/auth' : {
-    response: 'notFound'
-  },
+  'put /api/v1/auth/change-password' : 'v1/AuthController.changePassword'
 };

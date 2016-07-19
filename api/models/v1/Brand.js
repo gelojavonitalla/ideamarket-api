@@ -10,18 +10,21 @@ module.exports = {
 
   attributes: {
     id : {
-      type: "integer",
+      type: 'integer',
       primaryKey: true,
       autoIncrement: true
     },
     name: {
-      type: "string"
+      type: 'string'
     },
     officialName: {
-      type: "string"
+      type: 'string'
+    },
+    tags: {
+      type: 'array'
     },
     url: {
-      type: "string"
+      type: 'string'
     }
   }
 };

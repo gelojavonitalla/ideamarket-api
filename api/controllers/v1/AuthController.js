@@ -13,12 +13,13 @@ module.exports = {
     pluralize: false
   },
 
-  create: function (req, res) {
-    if (req.body) {
-      Auth.create(req.body).then(function(auth){
-        return res.send(auth);
-      }).catch(function(err){
-        return res.serverError(err);
+  signUp: function (req, res) {
+    var form = req.body;
+    if (form) {
+      User.create({name: form.name, auth: {username: form.username, password: form.password}}).then(function (user) {
+        return res.send(user);
+      }).catch(function (err) {
+        return res.negotiate(err);
       });
     } else {
       return res.badRequest("Missing request body");
